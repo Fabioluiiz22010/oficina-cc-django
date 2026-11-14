@@ -1,0 +1,73 @@
+{% extends "base/_base.html" %}
+{% block title %}Painel de Gerenciamento{% endblock %}
+{% block content %}
+
+    <h1 class="page-title">Painel Central de Gerenciamento</h1>
+
+    <section class="dashboard-section section-summary">
+        <h2 class="section-title">Visão Geral</h2>
+        <div class="dashboard-cards-container">
+            
+            <div class="home-status-card accent-card">
+                <h3 class="count-accent">{{ ordensAbertasCount }}</h3>
+                <p>Ordens em Serviço</p>
+                <a href="{% url 'ordemServicoLista' %}">Visualizar Detalhes →</a>
+            </div>
+
+            <div class="home-status-card primary-card">
+                <h3 class="count-primary-dark">{{ totalClientes }}</h3>
+                <p>Clientes Ativos</p>
+                <a href="{% url 'clienteLista' %}">Gerenciar Clientes →</a>
+            </div>
+
+            <div class="home-status-card primary-card">
+                <h3 class="count-primary-dark">{{ totalVeiculos }}</h3>
+                <p>Veículos Registrados</p>
+                <a href="{% url 'veiculoLista' %}">Gerenciar Veículos →</a>
+            </div>
+
+             <div class="home-status-card accent-card">
+                <h3 class="count-accent">{{ totalServicosCadastrados }}</h3>
+                <p>Serviços no Catálogo</p>
+                <a href="{% url 'servicoLista' %}">Ajustar Preços →</a>
+            </div>
+
+        </div>
+    </section>
+
+    <hr>
+
+    <section class="dashboard-section section-os">
+        <h2 class="section-title">Ordens de Serviço Mais Recentes</h2>
+        
+        {% if ordensEmServico %}
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Veículo (Placa)</th>
+                    <th>Cliente</th>
+                    <th>Serviço Principal</th>
+                    <th>Data Entrada</th>
+                    <th>Ação</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ordem in ordensEmServico %}
+                <tr>
+                    <td>{{ ordem.pk }}</td>
+                    <td>{{ ordem.veiculo.modeloDoVeiculo }} ({{ ordem.veiculo.placaDoVeiculo }})</td>
+                    <td>{{ ordem.veiculo.proprietarioDoVeiculo.nomeCompleto }}</td>
+                    <td>{{ ordem.servico.nomeDoServico }}</td>
+                    <td>{{ ordem.dataEntrada|date:"d/m/Y" }}</td>
+                    <td><a href="{% url 'ordemServicoEditar' pk=ordem.pk %}">Abrir OS</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="empty-message">Nenhuma ordem de serviço está em andamento no momento.</p>
+        {% endif %}
+    </section>
+
+{% endblock %}

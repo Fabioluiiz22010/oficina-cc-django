@@ -1,0 +1,35 @@
+{% extends "base/_base.html" %}
+{% block title %}Confirmar Exclusão de Veículo{% endblock %}
+
+{% block content %}
+
+<div style="max-width: 600px; margin: 50px auto; padding: 20px; border: 1px solid #ffcc00; background-color: #fff8e1; border-radius: 8px;">
+    
+    <h1 style="color: #d32f2f;">confirmação de Exclusão</h1>
+
+    <p style="font-size: 1.1em; margin-bottom: 25px;">
+        Você tem **certeza** que deseja **EXCLUIR** permanentemente o seguinte veículo?
+    </p>
+
+    <div style="padding: 15px; border: 1px dashed #ffb300; margin-bottom: 25px;">
+        <p><strong>Placa:</strong> {{ object.placaDoVeiculo }}</p>
+        <p><strong>Modelo:</strong> {{ object.marcaDoVeiculo }} / {{ object.modeloDoVeiculo }}</p>
+        <p><strong>Proprietário:</strong> {{ object.proprietarioDoVeiculo.nomeCompleto }}</p>
+    </div>
+
+    <form method="post" style="display: flex; gap: 15px;">
+        {% csrf_token %}
+        
+        <button type="submit" 
+                style="background-color: #d32f2f; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 1em;">
+            Sim, EXCLUIR
+        </button>
+        
+        <a href="{% url 'veiculoLista' %}" 
+        style="background-color: #9e9e9e; color: white; padding: 10px 20px; border-radius: 4px; text-decoration: none; display: inline-block;">
+            Cancelar
+        </a>
+    </form>
+</div>
+
+{% endblock %}

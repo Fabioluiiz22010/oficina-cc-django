@@ -1,0 +1,50 @@
+{% extends "base/_base.html" %}
+{% block title %}
+    {% if veiculo %}Editar Veículo{% else %}Novo Veículo{% endif %}
+{% endblock %}
+
+{% block content %}
+
+    <h1 class="page-title">
+        {% if veiculo %}EDITAR VEÍCULO{% else %}CADASTRAR NOVO VEÍCULO{% endif %}
+    </h1>
+    
+    <p>
+        <a href="{% url 'veiculoLista' %}" class="btn btn-outline-secondary">
+            ← Voltar para a Lista de Veículos
+        </a>
+    </p>
+
+    <hr>
+    {% if form.errors %}
+        <div style="color: red; padding: 10px; border: 1px solid red; margin-bottom: 20px;">
+            <p>Houve erros no formulário:</p>
+            {{ form.errors }}
+        </div>
+    {% endif %}
+    <form method="post">
+        {% csrf_token %}
+
+        {% for field in form %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}">{{ field.label }}:</label>
+                {{ field }}
+                {% if field.help_text %}
+                    <small class="form-text text-muted">{{ field.help_text }}</small>
+                {% endif %}
+                {% for error in field.errors %}
+                    <div style="color: red;">{{ error }}</div>
+                {% endfor %}
+            </div>
+        {% endfor %}
+        
+        
+
+        <div class="form-submit-group">
+            <button type="submit">
+                {% if veiculo %}Salvar Alterações{% else %}Cadastrar Veículo{% endif %}
+            </button>
+        </div>
+    </form>
+
+{% endblock %}

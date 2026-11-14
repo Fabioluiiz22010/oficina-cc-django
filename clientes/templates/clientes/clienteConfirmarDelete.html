@@ -1,0 +1,26 @@
+{% extends 'base/_base.html' %} 
+{% comment %} Ajuste 'base.html' para o nome do seu template base {% endcomment %}
+
+{% block content %}
+<div class="container">
+    <h2>Confirmação de Exclusão</h2>
+
+    <p class="alert alert-warning">
+        Você tem certeza que deseja **DELETAR** permanentemente o cliente: **{{ object.nome }}**?
+    </p>
+
+    {# 🎯 Formulário que envia a confirmação para a DeleteView #}
+    <form method="post">
+        {% csrf_token %}
+        
+        {# O campo oculto é crucial para a DeleteView saber qual objeto excluir #}
+        {# Embora não estritamente necessário, ajuda a clareza #}
+        <input type="hidden" name="id" value="{{ object.id }}"> 
+
+        <button type="submit" class="btn btn-danger">Sim, Excluir Cliente</button>
+        
+        {# Link de retorno para cancelar a operação #}
+        <a href="{% url 'clienteLista' %}" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+{% endblock content %}

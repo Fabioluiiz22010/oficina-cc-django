@@ -1,0 +1,79 @@
+{% extends "base/_base.html" %}
+{% block content %}
+
+    <h1 class="text-2xl font-bold mb-6">Lista de Serviços 🛠️</h1>
+    
+    <div class="mb-4">
+        <a href="{% url 'servicoCriar' %}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+            + Novo Serviço
+        </a>
+    </div>
+
+    <div class="bg-gray-100 p-4 rounded-lg shadow-md mb-6">
+        <h2 class="text-xl font-semibold mb-3">Filtro de Busca</h2>
+        <form method="get" class="space-y-4">
+            {{ filter.form.as_p }}
+            <button type="submit" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                Aplicar Filtro
+            </button>
+        </form>
+    </div>
+
+    <div class="overflow-x-auto shadow-lg rounded-lg">
+        <table class="min-w-full bg-white">
+            <thead class="bg-gray-800 text-white">
+                <tr>
+                    <th class="py-3 px-6 text-left">ID</th>
+                    <th class="py-3 px-6 text-left">Nome do Serviço</th>
+                    <th class="py-3 px-6 text-left">Valor Padrão</th>
+                    <th class="py-3 px-6 text-left">Status</th>
+                    <th class="py-3 px-6 text-center">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for servico in servicos %}
+                <tr class="border-b hover:bg-gray-50">
+                    <td class="py-3 px-6">{{ servico.pk }}</td>
+                    <td class="py-3 px-6 font-medium">{{ servico.nomeDoServico }}</td>
+                    <td class="py-3 px-6">R$ {{ servico.valorPadrao|floatformat:2 }}</td>
+                    <td class="py-3 px-6">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                            {% if servico.ativo %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">
+                            {% if servico.ativo %}Ativo{% else %}Inativo{% endif %}
+                        </span>
+                    </td>
+                    <td class="py-3 px-6 text-center space-x-2">
+                        <a href="{% url 'servicoEditar' servico.pk %}" class="text-yellow-600 hover:text-yellow-800">
+                            Editar
+                        </a>
+                        <a href="{% url 'servicoDeletar' servico.pk %}" class="text-red-600 hover:text-red-800">
+                            Deletar
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="py-4 text-center text-gray-500">Nenhum serviço encontrado.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="pagination mt-6 flex justify-center space-x-2">
+        {% if is_paginated %}
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}{{ filter.qs }}" class="py-2 px-4 border rounded hover:bg-gray-200">Anterior</a>
+            {% endif %}
+
+            <span class="py-2 px-4 bg-blue-500 text-white rounded">
+                Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}.
+            </span>
+
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}{{ filter.qs }}" class="py-2 px-4 border rounded hover:bg-gray-200">Próxima</a>
+            {% endif %}
+        {% endif %}
+    </div>
+
+{% endblock content %}

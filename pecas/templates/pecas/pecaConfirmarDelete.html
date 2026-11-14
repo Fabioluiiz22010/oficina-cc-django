@@ -1,0 +1,29 @@
+{% extends "base/_base.html" %}
+
+{% block content %}
+
+    <h1 class="text-2xl font-bold mb-6 text-red-600">Confirmação de Deleção de Peça 🗑️</h1>
+
+    <div class="max-w-lg mx-auto bg-white p-8 rounded-lg shadow-lg border border-red-300">
+        <p class="text-xl mb-6">
+            Você tem certeza que deseja deletar a peça **"{{ peca.nomeDaPeca }}"** (Código: **{{ peca.codigoDaPeca }}**)?
+        </p>
+
+        <p class="mb-8 text-gray-600">
+            **Atenção**: Esta peça será removida do estoque.
+        </p>
+
+        <form method="post" class="flex justify-center space-x-6">
+            {% csrf_token %}
+            
+            <button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-lg shadow-md transition duration-150">
+                Sim, Deletar
+            </button>
+            
+            <a href="{% url 'pecaLista' %}" class="bg-gray-400 hover:bg-gray-500 text-white font-bold py-3 px-6 rounded-lg shadow-md transition duration-150">
+                Cancelar
+            </a>
+        </form>
+    </div>
+
+{% endblock content %}

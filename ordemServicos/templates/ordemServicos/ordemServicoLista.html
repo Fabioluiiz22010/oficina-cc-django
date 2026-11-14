@@ -1,0 +1,89 @@
+{% extends "base/_base.html" %}
+{% block title %}Lista de Ordens de Serviço{% endblock %}
+
+{% block content %}
+    <div class="top-controls">
+        <h1>Ordens de Serviço (OS)</h1>
+        <a href="{% url 'ordemServicoCriar' %}">
+            <button>+ Abrir Nova OS</button>
+        </a>
+    </div>
+
+    <hr>
+    
+    <div class="filter-controls">
+        <h4>Filtros de Busca</h4>
+        <form method="get">
+            {{ filter.form.as_p }}
+            <button type="submit">Aplicar Filtros</button>
+            <a href="{% url 'ordemServicoLista' %}" class="clear-link">Limpar Filtros</a>
+        </form>
+    </div>
+    {% if filter.qs %}
+        <table>
+            <thead>
+                <tr>
+                    <th>OS #</th>
+                    <th>Veículo (Placa)</th>
+                    <th>Proprietário</th>
+                    <th>Serviço Principal</th>
+                    <th style="text-align: right;">Valor Total</th>
+                    <th>Status</th>
+                    <th style="text-align: center;">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for os in ordensServico %}
+                <tr>
+                    <td>{{ os.pk }}</td>
+                    <td>{{ os.veiculo.placaDoVeiculo }}</td>
+                    <td>{{ os.veiculo.proprietarioDoVeiculo.nome }}</td>
+                    <td>{{ os.servico.nomeDoServico }}</td>
+                    <td style="text-align: right;">R$ {{ os.valorTotal|floatformat:2 }}</td>
+                    
+                    <td>
+                        <span class="status-badge 
+                            {% if os.estaConcluida %}status-concluida{% else %}status-em-servico{% endif %}">
+                            {% if os.estaConcluida %}CONCLUÍDA{% else %}EM SERVIÇO{% endif %}
+                        </span>
+                    </td>
+                    <td style="text-align: center;">
+                        <a href="{% url 'ordemServicoEditar' pk=os.pk %}">Editar</a>
+                        <a href="{% url 'ordemServicoDeletar' pk=os.pk %}" style="color: var(--color-error);">Deletar</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        {% if is_paginated %}
+            <div class="pagination-controls">
+                <span class="step-links">
+                    {% if page_obj.has_previous %}
+                        <a href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                            &laquo; Anterior
+                        </a>
+                    {% else %}
+                        <span class="disabled">&laquo; Anterior</span>
+                    {% endif %}
+                    <span class="current-page">
+                        Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}.
+                    </span>
+                    {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                            Próxima &raquo;
+                        </a>
+                    {% else %}
+                        <span class="disabled">Próxima &raquo;</span>
+                    {% endif %}
+                </span>
+            </div>
+        {% endif %}
+
+    {% else %}
+        <p class="error-message" style="margin-top: 50px; border: none;">
+            Nenhuma Ordem de Serviço encontrada com os filtros aplicados.
+        </p>
+    {% endif %}
+
+{% endblock %}

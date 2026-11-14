@@ -1,0 +1,177 @@
+{% extends 'base/_base.html' %}
+
+{% block title %}
+    {% if ordemServico %}
+        Editar OS #{{ ordemServico.pk }}
+    {% else %}
+        Nova Ordem de Serviço
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="container">
+
+    <h1 class="page-title">
+        {% if ordemServico %}
+            EDITAR ORDEM DE SERVIÇO #{{ ordemServico.pk }}
+        {% else %}
+            CADASTRAR NOVA ORDEM DE SERVIÇO
+        {% endif %}
+    </h1>
+
+    <form method="post">
+        {% csrf_token %}
+
+        {{ form.as_p }}
+
+        <hr>
+        
+        <div style="grid-column: 1 / -1;">
+            <h3>Peças Utilizadas</h3>
+
+            {{ pecasFormset.management_form }}
+
+            <table id="pecas-form-container" class="table">
+                <thead>
+                    <tr>
+                        {# Definindo as larguras das colunas #}
+                        <th style="width: 65%;">Peça</th>
+                        <th style="width: 15%;">Quantidade</th>
+                        <th style="width: 20%;">Remover</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for sub in pecasFormset %}
+                    <tr class="peca-form-row">
+
+                        {{ sub.id }}
+                        
+                        <td>{{ sub.peca }}</td>
+                        <td>{{ sub.quantidadeUsada }}</td>
+                        
+                        <td class="delete-cell">
+                            {{ sub.DELETE }}
+                            <button type="button" class="removerPecaBtn">
+                                Excluir
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+
+                    <tr class="peca-form-row empty-form" style="display:none;">
+                        {# Campos ocultos #}
+                        {{ pecasFormset.empty_form.id }}
+                        
+                        <td>{{ pecasFormset.empty_form.peca }}</td>
+                        <td>{{ pecasFormset.empty_form.quantidadeUsada }}</td>
+
+                        <td class="delete-cell">
+                            {{ pecasFormset.empty_form.DELETE }}
+                            <button type="button" class="removerPecaBtn">
+                                Excluir
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <button type="button" id="adicionarPecaBtn">+ Adicionar Peça</button>
+        </div>
+
+        <div class="form-submit-group">
+            <button type="submit">
+                {% if ordemServico %}Salvar Alterações{% else %}Criar Ordem de Serviço{% endif %}
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block footer_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    
+    const formContainer = document.getElementById('pecas-form-container');
+    const tbody = formContainer.querySelector('tbody');
+    const totalForms = document.querySelector('#id_pecausada_set-TOTAL_FORMS');
+    const emptyRow = document.querySelector('.empty-form');
+    const addButton = document.getElementById('adicionarPecaBtn');
+
+    function applyStyles(element) {
+        element.querySelectorAll('select').forEach(select => {
+            select.style.width = '100%';
+        });
+        element.querySelectorAll('input[type="number"]').forEach(input => {
+             input.style.maxWidth = '80px'; 
+             input.style.textAlign = 'center';
+        });
+
+        element.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+            checkbox.style.display = 'none';
+        });
+    }
+
+    applyStyles(formContainer);
+    if (emptyRow) {
+        emptyRow.style.display = "none";
+    }
+
+    addButton.addEventListener('click', () => {
+        let formIndex = Number(totalForms.value);
+        let newRowHTML = emptyRow.outerHTML.replace(/__prefix__/g, formIndex);
+        
+        const temp = document.createElement('tbody');
+        temp.innerHTML = newRowHTML;
+        const newTr = temp.firstElementChild;
+        newTr.style.display = "table-row";
+
+        applyStyles(newTr);
+        const removeButton = newTr.querySelector('.removerPecaBtn');
+        if (removeButton) {
+            removeButton.addEventListener('click', handleRemove);
+        }
+
+        tbody.insertBefore(newTr, emptyRow);
+        totalForms.value = formIndex + 1;
+    });
+
+    function handleRemove(event) {
+        const row = event.target.closest('.peca-form-row');
+        const deleteCheckbox = row.querySelector('input[type="checkbox"]');
+        const idInput = row.querySelector('input[name$="-id"]'); // Seleciona o campo com nome que termina em -id
+        
+        if (idInput && idInput.value) {
+            
+            if (deleteCheckbox) {
+                deleteCheckbox.checked = true;
+            }
+            row.style.display = 'none';
+        } else {
+            row.remove();
+            updateFormIndices();
+        }
+    }
+    document.querySelectorAll('.removerPecaBtn').forEach(button => {
+        button.addEventListener('click', handleRemove);
+    });
+    function updateFormIndices() {
+        const rows = tbody.querySelectorAll('.peca-form-row:not(.empty-form)');
+        const formPrefix = 'id_pecausada_set-';
+        
+        rows.forEach((row, index) => {
+            row.querySelectorAll('*').forEach(element => {
+                if (element.id) {
+                    element.id = element.id.replace(/-\d+-/, `-${index}-`);
+                }
+                if (element.name) {
+                    element.name = element.name.replace(/-\d+-/, `-${index}-`);
+                }
+            });
+        });
+        
+        totalForms.value = rows.length;
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Oficina Mecânica C&C{% endblock %}</title>
+
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}?v=4"> 
+    {% block messages %}{% endblock %}
+
+</head>
+<body>
+    <header>
+        <div style="display: flex; align-items: center; gap: 15px;"> 
+            <img src="{% static 'img/logo.png' %}" alt="Logo Oficina C&C" style="height: 40px;">
+            <h3>Oficina Mecânica C&C</h3>
+        </div>
+        
+        <nav>
+            <a href="{% url 'home' %}">Dashboard</a> 
+            
+            <a href="/admin/">Admin</a>
+            
+            <a href="{% url 'clienteLista' %}">Clientes</a>
+            <a href="{% url 'veiculoLista' %}">Veículos</a>
+            <a href="{% url 'servicoLista' %}">Serviços</a>
+            <a href="{% url 'pecaLista' %}">Peças</a>
+            <a href="{% url 'ordemServicoLista' %}">Ordens de Serviço</a>
+        </nav>
+    </header>
+
+    <main>
+
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    {% block footer_scripts %}{% endblock %}
+
+</body>
+</html>

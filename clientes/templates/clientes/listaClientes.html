@@ -1,0 +1,96 @@
+{% extends 'base/_base.html' %}
+{% comment %} Ajuste 'base.html' para o nome do seu template base {% endcomment %}
+
+{% block content %}
+<div class="container">
+    <h1 class="page-title">Lista de Clientes <small>(Total: {{ filter.qs.count }})</small></h1>
+    
+    <div class="top-controls">
+        {# Botão de Adicionar Novo Cliente #}
+        <a href="{% url 'clienteCriar' %}">
+            <button>+ Adicionar Novo Cliente</button>
+        </a>
+    </div>
+
+    <hr>
+    
+    {# 🎯 NOVO ESTILO: Bloco de Filtros #}
+    <div class="filter-controls">
+        <h4>Filtros</h4>
+        {# O método GET é essencial para que os filtros funcionem #}
+        <form method="get">
+            {# Renderiza os campos do nosso ClienteFiltro #}
+            {{ filter.form.as_p }}
+            <button type="submit">Aplicar Filtros</button>
+            {# Link para limpar os filtros, usando a classe customizada #}
+            <a href="{% url 'clienteLista' %}" class="clear-link">Limpar</a>
+        </form>
+    </div>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>CPF</th>
+                <th>E-mail</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {# 🎯 Itera sobre filter.qs, que é o QuerySet já filtrado e paginado #}
+            {% for cliente in filter.qs %}
+            <tr>
+                {# 🎯 CORRIGIDO: Usando os nomes dos campos que REALMENTE existem no banco: nome, cpf, email #}
+                <td>{{ cliente.nome }}</td> 
+                <td>{{ cliente.cpf }}</td>
+                <td>{{ cliente.email }}</td>
+                
+                <td>
+                    <a href="{% url 'clienteEditar' pk=cliente.pk %}">Editar</a>
+                    <a href="{% url 'clienteDeletar' pk=cliente.pk %}">Excluir</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" class="empty-message">Nenhum cliente encontrado com os filtros aplicados.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {# 🎯 NOVO ESTILO: Bloco de Paginação #}
+    {% if is_paginated %}
+    <div class="pagination-controls">
+        <div class="step-links">
+            
+            {# Botão Anterior #}
+            {% if page_obj.has_previous %}
+                {# Adiciona os parâmetros de filtro na URL para manter a pesquisa #}
+                <a href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                    Anterior
+                </a>
+            {% else %}
+                <span class="disabled">Anterior</span>
+            {% endif %}
+
+            {# Exibe a página atual #}
+            <span class="current-page">
+                Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+            </span>
+
+            {# Botão Próximo #}
+            {% if page_obj.has_next %}
+                {# Adiciona os parâmetros de filtro na URL para manter a pesquisa #}
+                <a href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">
+                    Próxima
+                </a>
+            {% else %}
+                <span class="disabled">Próxima</span>
+            {% endif %}
+            
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock content %}

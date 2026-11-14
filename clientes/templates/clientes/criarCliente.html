@@ -1,0 +1,50 @@
+{% extends 'base/_base.html' %} 
+
+{% block content %}
+<div class="container">
+    
+    {# Exibir o título correto baseado na view (Criação ou Edição) #}
+    {% if cliente %}
+        {# 🎯 Usa o campo 'nomeCompleto' em camelCase do Model para o título #}
+        <h2>Editar Cliente: {{ cliente.nomeCompleto }}</h2> 
+    {% else %}
+        <h2>Cadastrar Novo Cliente</h2>
+    {% endif %}
+
+    <p>
+        <a href="{% url 'clienteLista' %}" class="btn btn-outline-secondary">
+            ← Voltar para a Lista de Clientes
+        </a>
+    </p>
+
+    <hr>
+    
+    {# Exibe erros de validação que não estão ligados a campos específicos #}
+    {% if form.non_field_errors %}
+        <div style="color: red; padding: 10px; border: 1px solid red; margin-bottom: 20px;">
+            <p>Por favor, corrija os seguintes erros:</p>
+            {{ form.non_field_errors }}
+        </div>
+    {% endif %}
+
+    {# 🎯 Formulário de Criação/Edição #}
+    <form method="post">
+        {% csrf_token %}
+        
+        {# 🛑 ÚNICA CHAMADA DE RENDERIZAÇÃO: Garante que os campos não sejam duplicados #}
+        {{ form.as_p }}
+
+        {# O bloco de código duplicado foi removido daqui #}
+
+        <div class="form-submit-group">
+            {# Define o texto do botão baseado se é edição ou criação #}
+            {% if cliente %}
+                <button type="submit" class="btn btn-success">Salvar Alterações</button>
+            {% else %}
+                <button type="submit" class="btn btn-primary">Cadastrar Cliente</button>
+            {% endif %}
+        </div>
+
+    </form>
+</div>
+{% endblock content %}
